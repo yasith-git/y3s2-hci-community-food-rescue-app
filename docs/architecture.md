@@ -1,6 +1,7 @@
 # System Architecture
 
-> **Status:** Initial Architecture / Foundation Phase
+> **Status:** UI/UX Shared Foundation Completed (Phase 1)
+> **Branch Source:** `dev`
 
 ## Architectural Overview
 
@@ -14,8 +15,9 @@ The Community Food-Bank and Surplus-Food Donation Mobile Application is built as
                                │
 ┌──────────────────────────────▼──────────────────────────────┐
 │                  Presentation Layer (src/)                  │
-│   Components (UI, Forms, Maps, Rescue, Notifications)       │
-│   Design System, Contexts, Hooks, Store                     │
+│   Shared UI Components (src/components/ui/)                  │
+│   Design System Tokens (src/design-system/)                 │
+│   Feature Components, Contexts, Hooks, Store                │
 └──────────────────────────────┬──────────────────────────────┘
                                │
 ┌──────────────────────────────▼──────────────────────────────┐
@@ -29,10 +31,19 @@ The Community Food-Bank and Surplus-Food Donation Mobile Application is built as
 └─────────────────────────────────────────────────────────────┘
 ```
 
+## Shared UI/UX Foundation Layer
+
+All 4 future feature roles (`(auth)`, `(donor)`, `(volunteer)`, `(coordinator)`) **MUST** consume the centralized UI layer:
+
+- **`src/design-system/`**: Source of truth for Colors, Typography, Spacing, Radius, Shadows, Glass tokens, Motion, and Haptics.
+- **`src/components/ui/`**: 20+ production-grade shared UI building blocks (`GlassSurface`, `GlassButton`, `GlassCard`, `PrimaryTextInput`, `StatusBadge`, `ScreenContainer`, etc.).
+
 ## Module Structure
 
 - **`app/`**: File-based routing with Expo Router grouping routes by role.
 - **`src/components/`**: Reusable atomic and feature-specific UI components.
+  - **`src/components/ui/`**: Shared Design System components.
+- **`src/design-system/`**: Centralized design tokens and theme export.
 - **`src/services/`**: Encapsulated business logic and API service wrappers.
 - **`src/types/`**: Shared TypeScript domain interfaces and type definitions.
 - **`functions/`**: Cloud Functions backend codebase (to be implemented in future phase).
