@@ -1,10 +1,11 @@
 {
   "expo": {
-    "name": "HCI_proj",
-    "slug": "HCI_proj",
+    "name": "food-rescue-app",
+    "slug": "food-rescue-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
+    "scheme": "foodrescue",
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true
@@ -20,6 +21,9 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-router"
+    ]
   }
 }
