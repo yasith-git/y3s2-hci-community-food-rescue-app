@@ -32,5 +32,6 @@ export * from './SuccessState';
 
 export * from './AnimatedPressable';
 
+export * from './FirebaseUnconfiguredBanner';
 export * from './AppBackground';
 export * from './ScreenContainer';

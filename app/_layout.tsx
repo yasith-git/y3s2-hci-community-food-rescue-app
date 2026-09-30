@@ -1,11 +1,138 @@
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
+/**
+ * Root Layout with Centralized AuthProvider and Role-Aware Route Protection
+ * Community Food Rescue App
+ */
 
-export default function RootLayout() {
+import React, { useEffect } from 'react';
+import { Stack, useRouter, useSegments } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { View, StyleSheet, ActivityIndicator, Text } from 'react-native';
+import { AuthProvider, useAuth } from '../src/contexts/AuthContext';
+import { AppBackground } from '../src/components/ui';
+import { colors } from '../src/design-system/colors';
+import { typography } from '../src/design-system/typography';
+import { radius } from '../src/design-system/radius';
+import { Ionicons } from '@expo/vector-icons';
+
+function RootNavigation() {
+  const { isAuthenticated, isLoading, isEmailVerified, role, isConfigured } = useAuth();
+  const segments = useSegments();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isLoading) return;
+
+    const inAuthGroup = segments[0] === '(auth)';
+    const inDonorGroup = segments[0] === '(donor)';
+    const inVolunteerGroup = segments[0] === '(volunteer)';
+    const inCoordinatorGroup = segments[0] === '(coordinator)';
+
+    // If unauthenticated, redirect to onboarding/login if trying to access protected role areas
+    if (!isAuthenticated) {
+      if (!inAuthGroup && segments.length > 0 && segments[0] !== undefined) {
+        // User accessed protected area without auth
+        router.replace('/(auth)/onboarding');
+      }
+      return;
+    }
+
+    const segArray = segments as string[];
+    // If authenticated but email is not verified, require verification
+    if (!isEmailVerified) {
+      if (segArray[1] !== 'verify-email') {
+        router.replace('/(auth)/verify-email');
+      }
+      return;
+    }
+
+    // If authenticated + verified but no role chosen, require role selection
+    if (!role) {
+      if (segArray[1] !== 'role-selection') {
+        router.replace('/(auth)/role-selection');
+      }
+      return;
+    }
+
+    // If authenticated + verified + role chosen, route to correct module if in auth group
+    if (inAuthGroup) {
+      if (role === 'DONOR') {
+        router.replace('/(donor)');
+      } else if (role === 'VOLUNTEER') {
+        router.replace('/(volunteer)');
+      } else if (role === 'COORDINATOR') {
+        router.replace('/(coordinator)');
+      }
+    }
+  }, [isAuthenticated, isLoading, isEmailVerified, role, segments]);
+
+  if (isLoading) {
+    return (
+      <AppBackground>
+        <View style={styles.splashContainer}>
+          <View style={styles.splashLogo}>
+            <Ionicons name="leaf" size={44} color={colors.brand.primary} />
+          </View>
+          <Text style={[typography.headingLarge, styles.splashTitle]}>Food Rescue</Text>
+          <Text style={[typography.bodyMedium, styles.splashSubtitle]}>
+            Connecting Surplus to Community
+          </Text>
+          <ActivityIndicator
+            size="small"
+            color={colors.brand.primary}
+            style={styles.splashSpinner}
+          />
+        </View>
+      </AppBackground>
+    );
+  }
+
   return (
     <>
-      <StatusBar style="auto" />
-      <Stack screenOptions={{ headerShown: false }} />
+      <StatusBar style="dark" />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="index" />
+        <Stack.Screen name="(auth)" />
+        <Stack.Screen name="(donor)" />
+        <Stack.Screen name="(volunteer)" />
+        <Stack.Screen name="(coordinator)" />
+      </Stack>
     </>
   );
 }
+
+export default function RootLayout() {
+  return (
+    <AuthProvider>
+      <RootNavigation />
+    </AuthProvider>
+  );
+}
+
+const styles = StyleSheet.create({
+  splashContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24,
+  },
+  splashLogo: {
+    width: 84,
+    height: 84,
+    borderRadius: radius['2xl'],
+    backgroundColor: colors.brand[100],
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  splashTitle: {
+    color: colors.brand[900],
+    marginBottom: 4,
+  },
+  splashSubtitle: {
+    color: colors.text.muted,
+    marginBottom: 24,
+  },
+  splashSpinner: {
+    marginTop: 8,
+  },
+});

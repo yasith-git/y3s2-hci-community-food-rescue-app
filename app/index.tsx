@@ -5,6 +5,7 @@
 
 import React, { useState } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
+import { useRouter } from 'expo-router';
 import {
   ScreenContainer,
   GlassCard,
@@ -30,6 +31,8 @@ import {
 import { colors, typography, spacing, radius } from '../src/design-system';
 
 export default function ShowcaseScreen() {
+  const router = useRouter();
+
   // Input states
   const [sampleText, setSampleText] = useState('');
   const [errorInput, setErrorInput] = useState('');
@@ -61,12 +64,12 @@ export default function ShowcaseScreen() {
         title="Design System Showcase"
         subtitle="Shared UI Foundation v1.0"
         rightAction={
-          <GlassIconButton
-            icon="sparkles"
+          <GlassButton
+            title="Launch App"
             size="small"
             variant="primary"
-            onPress={() => setButtonCount((c) => c + 1)}
-            accessibilityLabel="Showcase action"
+            icon="rocket-outline"
+            onPress={() => router.push('/(auth)/onboarding')}
           />
         }
       />

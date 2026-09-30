@@ -1,0 +1,24 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // User Profiles Collection
+    // Rules protect unauthorized reading/writing of other users' data
+    match /users/{userId} {
+      // Users can read their own profile
+      allow read: if request.auth != null && request.auth.uid == userId;
+      
+      // Users can create/update their profile upon registration/role selection
+      // Note: In future phases, verified status promotions for Coordinators should be restricted to admin/cloud functions.
+      allow create, update: if request.auth != null && request.auth.uid == userId;
+      
+      // Disallow deleting user accounts from client
+      allow delete: if false;
+    }
+    
+    // Default fallback - deny everything else
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
